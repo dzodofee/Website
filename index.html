@@ -357,7 +357,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--terracotta);box-shado
   var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxSYLBA9OSQ7ByvfyQsh4LP2MzUsaIUllb_8je3rc93BEqjtYHbEH9TqnvghW9WKhESCQ/exec';
   var DEMO = !/^https:\/\/script\.google\.com\//.test(ENDPOINT);
   var WHATSAPP = '233538835680';
-  var RULES = { days:[1,2,3,4,5], sameDay:12, nextDay:22, ahead:14, first:'', show:5 };
+  var RULES = { days:[1,2,3,4,5], sameDay:12, nextDay:22, ahead:14, first:'2026-11-02', opens:'2026-10-31', show:5 };
   var DISHES = [
     { id:'jollof', type:'main', name:'Assorted jollof rice', short:'Jollof', desc:'With beef, chicken, sausages, gizzard and vegetables.', orbit:'Beef · Chicken · Sausages · Gizzard · Vegetables · ', price:80 },
     { id:'fried-rice', type:'main', name:'Assorted fried rice', short:'Fried rice', desc:'With beef, chicken, sausages, gizzard, eggs and vegetables.', orbit:'Beef · Chicken · Sausages · Gizzard · Eggs · Vegetables · ', price:70 },
@@ -515,8 +515,10 @@ input:focus,textarea:focus{outline:none;border-color:var(--terracotta);box-shado
   function label(o){ return o.i === 0 ? 'Today' : o.i === 1 ? 'Tomorrow' : DAYS[o.date.getUTCDay()]; }
   function nice(k){ var d = new Date(k + 'T12:00:00Z'); return LONG[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + LMON[d.getUTCMonth()]; }
   var paused = false;
+  function notOpenYet(){ return RULES.opens && new Date().toISOString().slice(0, 10) < RULES.opens; }
   function renderDates(){
-    var list = paused ? [] : openDates(new Date()), box = $('dates'), keep = (document.querySelector('input[name="date"]:checked') || {}).value;
+    var early = notOpenYet();
+    var list = (paused || early) ? [] : openDates(new Date()), box = $('dates'), keep = (document.querySelector('input[name="date"]:checked') || {}).value;
     box.innerHTML = '';
     list.forEach(function(o, n){
       var l = document.createElement('label'); l.className = 'date';
@@ -529,8 +531,13 @@ input:focus,textarea:focus{outline:none;border-color:var(--terracotta);box-shado
       inp.addEventListener('change', function(){ $('err-date').hidden = true; });
     });
     $('noDates').hidden = list.length > 0;
+    $('noDates').textContent = early
+      ? 'Ordering opens on ' + nice(RULES.opens) + '.' + (RULES.first ? ' First deliveries are on ' + nice(RULES.first) + '.' : '') + ' Have a look at the menu in the meantime.'
+      : 'We’re not taking orders right now. For enquiries, call (+233) 593 764 210.';
+    $('placeBtn').disabled = early || paused;
     var w = $('windowLine').querySelector('span');
-    if (!list.length) w.textContent = 'Ordering is closed for now';
+    if (early) w.textContent = 'Ordering opens ' + nice(RULES.opens);
+    else if (!list.length) w.textContent = 'Ordering is closed for now';
     else { var f = list[0]; w.textContent = 'Now ordering for ' + (f.i === 0 ? 'today, until 12 PM' : f.i === 1 ? 'tomorrow, until 10 PM tonight' : nice(f.key)); }
   }
   renderDates(); setInterval(renderDates, 60000);
@@ -557,6 +564,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--terracotta);box-shado
   var ERR = {
     date_closed:'That delivery day has just closed. Please choose another day.',
     paused:'We’re not taking orders right now. For enquiries, call (+233) 593 764 210.',
+    not_open:'Ordering hasn’t opened yet. Please check back soon.',
     empty:'Add at least one dish to your order.', too_many:'For orders this large, please call us on (+233) 593 764 210.',
     phone:'Please enter a phone number we can WhatsApp.', email:'Please check your email address.', name:'Please enter your full name.', address:'Please add your area and address.',
     busy:'Lots of orders are arriving at once. Please tap the button again.', network:'We couldn’t connect. Check your internet connection and try again.'
@@ -607,7 +615,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--terracotta);box-shado
   });
 
   if (DEMO) $('demo').hidden = false;
-  else fetch(ENDPOINT).then(function(r){ return r.json(); }).then(function(c){ if (c && c.ok){ paused = !!c.paused; if (c.firstDate) RULES.first = c.firstDate; renderDates(); } }).catch(function(){});
+  else fetch(ENDPOINT).then(function(r){ return r.json(); }).then(function(c){ if (c && c.ok){ paused = !!c.paused; if (c.firstDate) RULES.first = c.firstDate; if ('opens' in c) RULES.opens = c.opens || ''; renderDates(); } }).catch(function(){});
   renderAll();
   requestAnimationFrame(function(){ markActive(); });
 })();
