@@ -235,6 +235,50 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
 .done p{margin:12px auto 0;max-width:30em;color:var(--soft)}
 .done .lines{text-align:left;max-width:340px;margin:18px auto 0}
 .done .lines li{grid-template-columns:1fr}
+.loc{display:grid;gap:10px;padding:14px;border-radius:14px;background:rgba(62,30,22,.4);border:1px solid var(--card-line)}
+.loch{margin:0;font-size:.86rem;font-weight:500}.loch em{font-style:normal;font-weight:400;color:var(--faint)}
+#placeSlot gmp-place-autocomplete{width:100%;color-scheme:dark}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:.84rem;color:var(--soft);cursor:pointer}
+.consent input{margin-top:3px;width:18px;height:18px;accent-color:#C9A96A;flex:none}
+.locbtn{padding:12px 16px;font-size:.92rem}
+.locbtn svg{width:18px;height:18px}
+.locbtn:disabled{opacity:.45;cursor:not-allowed}
+.locok{margin:0;font-size:.86rem;color:var(--ivory)}
+.locok a,.locok button{color:var(--gold);background:none;border:0;padding:0;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.track{position:relative;z-index:1;padding-top:10px;padding-bottom:60px}
+.tcard{max-width:560px;margin:14px auto 0;padding:26px 22px;border-radius:22px;background:var(--card);border:1px solid var(--card-line)}
+.tcard .caps{margin:0;color:var(--gold);font-size:.7rem}
+.tt{margin:6px 0 0;font-family:var(--display);font-weight:600;font-size:2rem;line-height:1.1}
+.tsub{margin:8px 0 0;color:var(--soft)}
+.steps{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:0}
+.steps li{position:relative;display:grid;grid-template-columns:28px 1fr;gap:14px;padding:0 0 20px;color:var(--faint)}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:13px;top:26px;bottom:-2px;width:2px;background:var(--line)}
+.steps li:last-child::before{display:none}
+.steps i{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:.8rem;background:var(--bg);position:relative;z-index:1}
+.steps b{display:block;font-weight:600;color:inherit}
+.steps small{display:block;font-size:.8rem;margin-top:2px}
+.steps li.sd{color:var(--ivory)}.steps li.sd i{background:var(--gold);border-color:var(--gold);color:var(--cocoa)}
+.steps li.sd::before{background:var(--gold)}
+.steps li.sn{color:var(--ivory)}.steps li.sn i{border-color:var(--gold);box-shadow:0 0 0 5px rgba(201,169,106,.18)}
+.steps li.sn i::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.codebox{display:grid;gap:4px;justify-items:center;text-align:center;margin:20px auto 0;max-width:340px;padding:16px;border-radius:16px;background:rgba(201,169,106,.12);border:1px dashed rgba(201,169,106,.5)}
+.codebox span{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.codebox b{font-family:var(--display);font-size:2.6rem;letter-spacing:.3em;line-height:1.1;padding-left:.3em}
+.codebox small{font-size:.8rem;color:var(--soft)}
+.codebox a{margin-top:6px;color:var(--gold);font-weight:600;text-decoration:none}
+.riderbox{margin-top:16px;padding:12px 14px;border-radius:12px;background:rgba(62,30,22,.45);font-size:.92rem}
+.riderbox a{color:var(--gold)}
+.track .lines{margin-top:18px}.track .lines li{grid-template-columns:1fr;color:var(--soft);font-size:.92rem}
+.track .actions{display:grid;gap:10px;margin-top:22px}
+.slip{display:grid;gap:12px;margin-top:18px}
+.srow{display:grid;grid-template-columns:92px 1fr;gap:10px;font-size:.95rem}.srow span{color:var(--faint)}.srow b{font-weight:500}
+.slip .sh{margin-top:6px}
+.allergy{padding:12px 14px;border-radius:12px;background:rgba(231,162,143,.14);color:var(--error);font-size:.92rem}
+.codecheck{display:grid;gap:10px;margin-top:6px;padding-top:14px;border-top:1px dashed var(--line)}
+#rCode{font-family:var(--display);font-size:2rem;letter-spacing:.4em;text-align:center}
+.rres{margin:0;padding:12px 14px;border-radius:12px;font-weight:600;text-align:center}
+.rres.ok{background:rgba(120,180,110,.18);color:#BFE3B4}.rres.no{background:rgba(231,162,143,.16);color:var(--error)}
 .momo{display:grid;gap:8px;margin:20px auto 0;max-width:340px;padding:16px 18px;border-radius:16px;background:rgba(201,169,106,.12);border:1px solid rgba(201,169,106,.35);text-align:left}
 .momo .caps{margin:0 0 4px;color:var(--gold);font-size:.7rem}
 .mrow{display:flex;justify-content:space-between;gap:12px;font-size:.95rem}.mrow span{color:var(--soft)}.mrow b{font-weight:600;text-align:right}
@@ -382,6 +426,47 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
       </div>
     </section>
 
+    <section class="track px" id="trackView" hidden aria-live="polite">
+      <div class="tcard" id="trackCard">
+        <p class="caps" id="tKick">Your order</p>
+        <h2 class="tt" id="tTitle">Loading…</h2>
+        <p class="tsub" id="tkSub"></p>
+        <ol class="steps" id="tSteps"></ol>
+        <div class="codebox" id="tCode" hidden><span id="tCodeLbl">Delivery code</span><b id="tCodeVal"></b><small id="tCodeNote"></small></div>
+        <div class="riderbox" id="tRider" hidden></div>
+        <ul class="lines" id="tItems"></ul>
+        <div class="actions">
+          <a class="btn terra wa" id="tWa" href="#" target="_blank" rel="noopener">Questions? WhatsApp us</a>
+          <a class="btn ghost" href="./">Back to the menu</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="track px" id="riderView" hidden>
+      <div class="tcard">
+        <p class="caps">Delivery slip</p>
+        <h2 class="tt" id="rTitle">Loading…</h2>
+        <p class="tsub" id="rSub"></p>
+        <div class="slip" id="rSlip" hidden>
+          <div class="srow"><span>Customer</span><b id="rName"></b></div>
+          <a class="btn ghost" id="rCall" href="#">Call customer</a>
+          <div class="srow"><span>Area</span><b id="rArea"></b></div>
+          <div class="srow"><span>Address</span><b id="rAddr"></b></div>
+          <div class="srow" id="rDirRow"><span>Directions</span><b id="rDir"></b></div>
+          <a class="btn" id="rMap" href="#" target="_blank" rel="noopener">Open in Google Maps</a>
+          <p class="caps sh">In the bag</p>
+          <ul class="lines" id="rItems"></ul>
+          <div class="allergy" id="rNotes" hidden></div>
+          <button class="btn ghost" type="button" id="rPick">I’ve picked up the food</button>
+          <div class="codecheck">
+            <label class="f">Customer’s 4-digit code<input type="text" id="rCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></label>
+            <button class="btn" type="button" id="rCheck">Check code &amp; complete delivery</button>
+            <p class="rres" id="rRes" hidden></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="order px" id="order" role="tabpanel" aria-labelledby="tab-order" hidden>
       <h2 class="v" id="orderTitle">My order</h2>
       <div class="demo" id="demo" hidden><b>Preview.</b> Orders placed here are not saved or sent. The delivery areas and fees are examples only.</div>
@@ -423,6 +508,14 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
             <div class="fields" id="addrFields" style="margin-top:0">
               <label class="f">Area<select id="area"><option value="">Choose your area</option></select></label>
               <p class="note" style="margin:0">Area not listed? Call (+233) 593 764 210 and we’ll see what we can do.</p>
+              <div class="loc" id="locBox">
+                <p class="loch">Find your exact location <em>(optional, helps our rider)</em></p>
+                <div id="placeWrap" hidden><div id="placeSlot"></div></div>
+                <label class="consent"><input type="checkbox" id="locConsent"><span>I agree to share my current location with dzodofe, only to deliver this order.</span></label>
+                <button type="button" class="btn ghost locbtn" id="locBtn" disabled><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3" fill="currentColor"/><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Use my current location</button>
+                <p class="locok" id="locOk" hidden><span id="locText"></span> <a id="locMap" href="#" target="_blank" rel="noopener">View on map</a> · <button type="button" id="locClear">Remove</button></p>
+                <p class="err" id="locErr" hidden></p>
+              </div>
               <label class="f">House or street address<input type="text" id="address" autocomplete="street-address" maxlength="200"></label>
               <label class="f">Directions or GhanaPost GPS <em>(optional)</em><input type="text" id="directions" maxlength="200" placeholder="e.g. GA-123-4567, or a nearby landmark"></label>
             </div>
@@ -462,6 +555,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
           <button class="btn" type="button" id="payBtn">Pay GH₵0 now</button>
           <p class="small" id="payMsg">Secure Mobile Money payment by Paystack</p>
         </div>
+        <div class="codebox" id="doneCode" hidden><span id="doneCodeLbl">Your delivery code</span><b id="doneCodeVal"></b><small id="doneCodeNote">Only give this code to our rider once your food is in your hands. It’s also in your email.</small><a id="doneTrack" href="#">Track my order →</a></div>
         <div class="paid" id="paidBox" hidden><b>Payment received ✓</b><span id="paidLine"></span></div>
         <div class="actions">
           <a class="btn terra wa" id="waBtn" href="#" target="_blank" rel="noopener">
@@ -852,7 +946,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     var items = Object.keys(cart).map(function(k){ return { id:kItem(k), spice:kSpice(k), qty:cart[k] }; });
     var data = { date: document.querySelector('input[name="date"]:checked').value, name: val('name'), phone: val('phone'), email: val('email'),
       fulfil: $('ful-rider').checked ? 'rider' : 'delivery',
-      area: $('ful-rider').checked ? '' : val('area'), address: $('ful-rider').checked ? '' : val('address'), directions: $('ful-rider').checked ? '' : val('directions'), notes: val('notes'),
+      area: $('ful-rider').checked ? '' : val('area'), address: $('ful-rider').checked ? '' : val('address'), directions: $('ful-rider').checked ? '' : val('directions'), pin: $('ful-rider').checked ? null : PIN, place: $('ful-rider').checked ? '' : PLACE, notes: val('notes'),
       payment: MANUAL ? 'momo' : 'online', items: items, website: $('website').value };
     var btn = $('placeBtn'), label0 = btn.textContent;
     btn.disabled = true; btn.innerHTML = '<span class="spin" aria-hidden="true"></span> Placing your order…';
@@ -866,7 +960,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
       }
       finish(data, res);
     };
-    if (DEMO){ setTimeout(function(){ done({ ok:true, orderId:'DZ' + data.date.slice(5,7) + data.date.slice(8,10) + '-PRVW', emailSent:null, fee: feeNow() || 0 }); }, 700); return; }
+    if (DEMO){ setTimeout(function(){ done({ ok:true, orderId:'DZ' + data.date.slice(5,7) + data.date.slice(8,10) + '-PRVW', emailSent:null, fee: feeNow() || 0, code:'4827', track:'?track=DEMO&k=demo' }); }, 700); return; }
     fetch(ENDPOINT, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(data) })
       .then(function(r){ return r.json(); }).then(done)
       .catch(function(){ done({ ok:false, error:'network' }); });
@@ -885,6 +979,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     var ul = $('doneLines'); ul.innerHTML = '';
     var rows = lines.concat(['Food: ' + ced(food), d.fulfil === 'rider' ? 'Delivery: none (your own rider)' : 'Delivery to ' + d.area + ': ' + ced(fee), 'Total: ' + ced(total)]);
     rows.forEach(function(t, i, a){ var li = document.createElement('li'); var s = document.createElement('span'); s.textContent = t; if (i === a.length - 1) s.style.fontWeight = '600'; li.appendChild(s); ul.appendChild(li); });
+    if (res.code){ $('doneCode').hidden = false; $('doneCodeVal').textContent = res.code; $('doneCodeLbl').textContent = d.fulfil === 'rider' ? 'Your pickup code' : 'Your delivery code';
+      $('doneCodeNote').textContent = d.fulfil === 'rider' ? 'Your rider will need this code to collect your food. It’s also in your email.' : 'Only give this code to our rider once your food is in your hands. It’s also in your email.';
+      $('doneTrack').href = res.track || '#'; $('doneTrack').hidden = !res.track; }
+    else $('doneCode').hidden = true;
     var msg = MANUAL ? 'Hello dzodofe, I’ve paid ' + ced(total) + ' by MoMo for order ' + res.orderId + ' (' + nice(d.date) + '). Here is my payment screenshot:' : 'Hello dzodofe, this is about order ' + res.orderId + ' (' + nice(d.date) + ').\n\n';
     $('waBtn').lastChild.textContent = MANUAL ? ' Send payment screenshot on WhatsApp' : ' Message us on WhatsApp';
     $('waBtn').href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(msg);
@@ -950,8 +1048,57 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     var rider = $('ful-rider').checked;
     $('addrFields').hidden = rider; $('riderNote').hidden = !rider; $('err-address').hidden = true; renderAll();
   }); });
+
+  /* ----- location: Google search + current location (with consent) ----- */
+  var GMAPS_KEY = '', PIN = null, PLACE = '';
+  function setPin(lat, lng, label){
+    PIN = { lat: Math.round(lat * 1e6) / 1e6, lng: Math.round(lng * 1e6) / 1e6 };
+    $('locText').textContent = '📍 ' + (label || 'Location added');
+    $('locMap').href = 'https://www.google.com/maps?q=' + PIN.lat + ',' + PIN.lng;
+    $('locOk').hidden = false; $('locErr').hidden = true;
+  }
+  function clearPin(){ PIN = null; PLACE = ''; $('locOk').hidden = true; $('locErr').hidden = true; $('locConsent').checked = false; $('locBtn').disabled = true; var pa = $('placeSlot').firstChild; if (pa && 'value' in pa) try { pa.value = ''; } catch(e){} }
+  $('locClear').addEventListener('click', clearPin);
+  $('locConsent').addEventListener('change', function(){ $('locBtn').disabled = !this.checked; });
+  $('locBtn').addEventListener('click', function(){
+    var b = this, e = $('locErr');
+    if (!$('locConsent').checked) return;
+    if (!navigator.geolocation){ e.textContent = 'Your browser can’t share location. Please type your address instead.'; e.hidden = false; return; }
+    b.disabled = true; var t0 = b.lastChild.textContent; b.lastChild.textContent = 'Finding you…';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      b.disabled = false; b.lastChild.textContent = t0;
+      PLACE = PLACE || 'Current location';
+      setPin(pos.coords.latitude, pos.coords.longitude, 'Your current location is added');
+    }, function(err){
+      b.disabled = false; b.lastChild.textContent = t0;
+      e.textContent = err && err.code === 1 ? 'Location permission was turned off. You can allow it in your browser settings, or just type your address.' : 'We couldn’t get your location. Please type your address instead.';
+      e.hidden = false;
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  });
+  if (GMAPS_KEY && GMAPS_KEY.indexOf('__') !== 0){
+    window.dzMapsReady = function(){
+      try {
+        google.maps.importLibrary('places').then(function(lib){
+          var pa = new lib.PlaceAutocompleteElement({ includedRegionCodes: ['gh'] });
+          pa.setAttribute('placeholder', 'Search your location, e.g. A&C Mall, East Legon');
+          $('placeSlot').appendChild(pa); $('placeWrap').hidden = false;
+          pa.addEventListener('gmp-select', function(ev){
+            var place = ev.placePrediction.toPlace();
+            place.fetchFields({ fields: ['displayName', 'formattedAddress', 'location'] }).then(function(){
+              PLACE = (place.displayName ? place.displayName + ', ' : '') + (place.formattedAddress || '');
+              if (place.location) setPin(place.location.lat(), place.location.lng(), PLACE);
+              if (!val('address')) $('address').value = (place.formattedAddress || PLACE).slice(0, 200);
+            });
+          });
+        });
+      } catch(e){}
+    };
+    var gs = document.createElement('script');
+    gs.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(GMAPS_KEY) + '&loading=async&callback=dzMapsReady&v=weekly';
+    gs.async = true; document.head.appendChild(gs);
+  }
   $('againBtn').addEventListener('click', function(){
-    $('done').hidden = true; $('orderForm').hidden = false; $('orderForm').reset(); renderDates(); renderAll();
+    $('done').hidden = true; $('orderForm').hidden = false; $('orderForm').reset(); clearPin(); renderDates(); renderAll();
     renderZones();
     showTab('menu');
   });
@@ -962,6 +1109,65 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
   }
   $('mCopy').addEventListener('click', function(){ var b = this; try { navigator.clipboard.writeText(MOMO.number.replace(/\s/g,'')).then(function(){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy MoMo number'; }, 1800); }); } catch(e){} });
   if (MANUAL){ $('payNote').textContent = 'After you place your order, you’ll see our MoMo number and your order number. Send the full total (food and delivery), then send us the screenshot on WhatsApp. We confirm your order once the payment arrives.'; $('emailHint').textContent = '(optional, for your receipt)'; }
+  /* ----- tracking & rider slip ----- */
+  var QS = new URLSearchParams(location.search);
+  function onlyView(id){ ['home','order','dish'].forEach(function(x){ $(x).hidden = true; }); document.querySelector('.tabs').hidden = true; $('bagbar').style.display = 'none'; $(id).hidden = false; }
+  function get(params){ return DEMO ? Promise.resolve(demoData(params)) : fetch(ENDPOINT + '?' + new URLSearchParams(params)).then(function(r){ return r.json(); }); }
+  function post(body){ return DEMO ? Promise.resolve(body.action === 'deliver' ? { ok:true, match: body.code === '4827', left:3 } : { ok:true, status:'Out for delivery' }) : fetch(ENDPOINT, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(body) }).then(function(r){ return r.json(); }); }
+  function demoData(p){ return { ok:true, id:'DZ1102-PRVW', status: p.status || 'Out for delivery', paid:true, pickup:false, day:'Monday 2 November', items:['1 × Assorted jollof rice · Spicy','1 × Chicken wings · Mild'], first:'Ama', code:'4827',
+    rider:{ name:'Kofi', phone:'024 000 0000' }, name:'Ama Mensah', phone:'0241234567', area:'East Legon', address:'12 Palm Street', directions:'Opposite the pharmacy', map:'https://www.google.com/maps?q=5.6363,-0.1667', notes:'No peanuts, please' }; }
+  function fillItems(ul, items){ ul.innerHTML = ''; (items || []).forEach(function(t){ var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); }); }
+  function showTrack(){
+    onlyView('trackView');
+    get({ track: QS.get('track'), k: QS.get('k') || '' }).then(function(o){
+      if (!o || !o.ok){ $('tTitle').textContent = 'We couldn’t find that order'; $('tkSub').textContent = 'Please check the link in your email, or WhatsApp us on 053 883 5680.'; return; }
+      $('tKick').textContent = 'Order ' + o.id;
+      var steps = o.pickup
+        ? [['Order received',''],['Payment confirmed',''],['Preparing your food',''],['Ready for pickup','Send your rider with your pickup code'],['Collected','Enjoy your meal!']]
+        : [['Order received',''],['Payment confirmed',''],['Preparing your food',''],['Rider on the way',''],['Delivered','Enjoy your meal!']];
+      var map = { 'New':o.paid ? 1 : 0, 'Confirmed':1, 'Preparing':2, 'Ready for pickup':3, 'Out for delivery':3, 'Delivered':4 };
+      var at = o.status in map ? map[o.status] : 0;
+      if (o.status === 'Cancelled'){ $('tTitle').textContent = 'This order was cancelled'; $('tkSub').textContent = 'If you paid, your refund is on its way. Questions? WhatsApp us on 053 883 5680.'; }
+      else { $('tTitle').textContent = at >= 4 ? 'Enjoy, ' + o.first + '!' : steps[at][0]; $('tkSub').textContent = (o.pickup ? 'Pickup on ' : 'Delivery on ') + o.day; }
+      var ol = $('tSteps'); ol.innerHTML = ''; ol.hidden = o.status === 'Cancelled';
+      steps.forEach(function(st, i){ var li = document.createElement('li'); li.className = i < at || (i === at && at === 4) ? 'sd' : i === at ? 'sn' : '';
+        li.innerHTML = '<i>' + (i < at || (i === at && at === 4) ? '✓' : '') + '</i><div><b></b><small></small></div>'; li.querySelector('b').textContent = st[0]; li.querySelector('small').textContent = i === at ? st[1] : ''; ol.appendChild(li); });
+      if (o.code && at < 4 && o.status !== 'Cancelled'){ $('tCode').hidden = false; $('tCodeVal').textContent = o.code; $('tCodeLbl').textContent = o.pickup ? 'Pickup code' : 'Delivery code';
+        $('tCodeNote').textContent = o.pickup ? 'Your rider will need this code to collect the food.' : 'Only give this code to our rider once your food is in your hands.'; }
+      if (o.rider && at === 3 && !o.pickup){ var rb = $('tRider'); rb.hidden = false; rb.innerHTML = '🛵 Your rider: <b></b>' + (o.rider.phone ? ' · <a></a>' : ''); rb.querySelector('b').textContent = o.rider.name;
+        if (o.rider.phone){ var a = rb.querySelector('a'); a.textContent = o.rider.phone; a.href = 'tel:' + o.rider.phone.replace(/\s/g,''); } }
+      fillItems($('tItems'), o.items);
+      $('tWa').href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent('Hello dzodofe, this is about my order ' + o.id + '.');
+    }).catch(function(){ $('tTitle').textContent = 'We couldn’t connect'; $('tkSub').textContent = 'Check your internet connection and refresh the page.'; });
+  }
+  function showRider(){
+    onlyView('riderView');
+    var id = QS.get('rider'), k = QS.get('k') || '';
+    get({ rider: id, k: k }).then(function(o){
+      if (!o || !o.ok){ $('rTitle').textContent = 'Slip not found'; $('rSub').textContent = 'Please ask dzodofe to resend the link.'; return; }
+      $('rTitle').textContent = o.id; $('rSub').textContent = (o.pickup ? 'Pickup · ' : 'Delivery · ') + o.day + ' · ' + o.status;
+      $('rSlip').hidden = false; $('rName').textContent = o.name; $('rCall').href = 'tel:' + String(o.phone).replace(/\s/g,''); $('rCall').textContent = 'Call ' + o.name.split(' ')[0] + ' · ' + o.phone;
+      $('rArea').textContent = o.area || '-'; $('rAddr').textContent = o.address || '-'; $('rDir').textContent = o.directions || ''; $('rDirRow').hidden = !o.directions; $('rMap').href = o.map;
+      fillItems($('rItems'), o.items);
+      if (o.notes){ $('rNotes').hidden = false; $('rNotes').textContent = '⚠️ Notes / allergies: ' + o.notes; }
+      if (o.status === 'Out for delivery' || o.status === 'Delivered'){ $('rPick').hidden = true; }
+      if (o.status === 'Delivered'){ var r0 = $('rRes'); r0.hidden = false; r0.className = 'rres ok'; r0.textContent = '✅ This order has already been delivered.'; $('rCheck').disabled = true; }
+    }).catch(function(){ $('rTitle').textContent = 'No connection'; $('rSub').textContent = 'Check your internet and refresh.'; });
+    $('rPick').addEventListener('click', function(){ var b = this; b.disabled = true; post({ action:'pickup', id:id, k:k }).then(function(r){ b.textContent = r && r.ok ? '✓ Picked up: the customer can see you’re on the way' : 'Couldn’t update. Try again'; b.disabled = !(r && r.ok) ? false : true; $('rSub').textContent = $('rSub').textContent.replace(/·[^·]*$/, '· Out for delivery'); }); });
+    $('rCheck').addEventListener('click', function(){
+      var code = $('rCode').value.replace(/\D/g,''), res = $('rRes'), b = this;
+      if (code.length !== 4){ res.hidden = false; res.className = 'rres no'; res.textContent = 'Enter the 4-digit code from the customer.'; return; }
+      b.disabled = true; b.textContent = 'Checking…';
+      post({ action:'deliver', id:id, k:k, code:code }).then(function(r){
+        b.textContent = 'Check code & complete delivery'; res.hidden = false;
+        if (r && r.ok && r.match){ res.className = 'rres ok'; res.textContent = '✅ Code matches. Hand over the food. Delivery complete!'; b.disabled = true; $('rPick').hidden = true; }
+        else if (r && r.error === 'locked'){ res.className = 'rres no'; res.textContent = 'Too many wrong codes. Call dzodofe before handing over.'; }
+        else { res.className = 'rres no'; res.textContent = '❌ Code doesn’t match. Don’t hand over yet. Ask the customer to check their email or thank-you screen.' + (r && r.left >= 0 ? ' (' + r.left + ' tries left)' : ''); b.disabled = false; }
+      }).catch(function(){ b.disabled = false; b.textContent = 'Check code & complete delivery'; res.hidden = false; res.className = 'rres no'; res.textContent = 'No connection. Try again.'; });
+    });
+  }
+  if (QS.get('track')) showTrack(); else if (QS.get('rider')) showRider();
+
   if (DEMO) $('demo').hidden = false;
   loadConfig();
   $('glowA').style.setProperty('--glow', DISHES[0].glow);
