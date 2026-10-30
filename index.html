@@ -1068,13 +1068,19 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     $('locMap').href = 'https://www.google.com/maps?q=' + PIN.lat + ',' + PIN.lng;
     $('locOk').hidden = false; $('locErr').hidden = true;
   }
+  var AREA_LOCKED = false;
+  function lockArea(on, clear){
+    AREA_LOCKED = on; $('area').disabled = on;
+    if (clear){ $('area').value = ''; $('area').dispatchEvent(new Event('change')); }
+  }
   function suggestArea(lat, lng){
     var hint = $('areaHint');
-    if (!ZONES.length || $('area').value) return;
+    if (!ZONES.length) return;
+    lockArea(true, true);
     hint.textContent = 'Finding your area…'; hint.hidden = false;
     var ctl = ('AbortController' in window) ? new AbortController() : null;
     var timer = setTimeout(function(){ if (ctl) ctl.abort(); }, 7000);
-    function miss(){ clearTimeout(timer); hint.textContent = 'We couldn’t tell your area. Please choose it below.'; hint.hidden = false; }
+    function miss(){ clearTimeout(timer); lockArea(false, true); hint.textContent = 'We couldn’t tell your area. Please choose it below.'; hint.hidden = false; }
     fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&addressdetails=1&accept-language=en&lat=' + lat + '&lon=' + lng, ctl ? { signal: ctl.signal } : {})
       .then(function(r){ return r.json(); })
       .then(function(j){
@@ -1082,13 +1088,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
         var a = (j && j.address) || {}, hay = [];
         ['suburb','neighbourhood','quarter','city_district','village','town','hamlet','locality','residential'].forEach(function(k){ if (a[k]) hay.push(String(a[k]).trim().toLowerCase()); });
         var z = ZONES.filter(function(x){ return hay.indexOf(String(x.area).trim().toLowerCase()) !== -1; })[0];
-        if (!z || $('area').value) return miss();
+        if (!z) return miss();
         $('area').value = z.area; $('area').dispatchEvent(new Event('change'));
-        hint.textContent = 'We picked ' + z.area + ' from your location. Please check it’s right.'; hint.hidden = false;
+        hint.textContent = 'Delivering to ' + z.area + ', from your location. To choose another area, tap Remove above.'; hint.hidden = false;
       })
       .catch(miss);
   }
-  function clearPin(){ $('areaHint').hidden = true; PIN = null; PLACE = ''; $('locOk').hidden = true; $('locErr').hidden = true; $('locConsent').checked = false; $('locBtn').disabled = true; var pa = $('placeSlot').firstChild; if (pa && 'value' in pa) try { pa.value = ''; } catch(e){} }
+  function clearPin(){ $('areaHint').hidden = true; if (AREA_LOCKED) lockArea(false, true); else $('area').disabled = false; PIN = null; PLACE = ''; $('locOk').hidden = true; $('locErr').hidden = true; $('locConsent').checked = false; $('locBtn').disabled = true; var pa = $('placeSlot').firstChild; if (pa && 'value' in pa) try { pa.value = ''; } catch(e){} }
   $('locClear').addEventListener('click', clearPin);
   $('locConsent').addEventListener('change', function(){ $('locBtn').disabled = !this.checked; });
   $('locBtn').addEventListener('click', function(){
