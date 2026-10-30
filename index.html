@@ -243,6 +243,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
 .locbtn{padding:12px 16px;font-size:.92rem}
 .locbtn svg{width:18px;height:18px}
 .locbtn:disabled{opacity:.45;cursor:not-allowed}
+.more summary{cursor:pointer;color:var(--gold);font-size:.86rem;list-style:none;text-decoration:underline;text-underline-offset:3px;width:max-content}
+.more summary::-webkit-details-marker{display:none}
+.more[open] summary{margin-bottom:10px}
 .locok{margin:0;font-size:.86rem;color:var(--ivory)}
 .locok a,.locok button{color:var(--gold);background:none;border:0;padding:0;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .track{position:relative;z-index:1;padding-top:10px;padding-bottom:60px}
@@ -506,18 +509,26 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
           </div>
           <div class="fields">
             <div class="fields" id="addrFields" style="margin-top:0">
-              <label class="f">Area<select id="area"><option value="">Choose your area</option></select></label>
-              <p class="note" style="margin:0">Area not listed? Call (+233) 593 764 210 and we’ll see what we can do.</p>
               <div class="loc" id="locBox">
-                <p class="loch">Find your exact location <em>(optional, helps our rider)</em></p>
+                <p class="loch">Use your location <em>(optional: picks your area and helps our rider)</em></p>
                 <div id="placeWrap" hidden><div id="placeSlot"></div></div>
-                <label class="consent"><input type="checkbox" id="locConsent"><span>I agree to share my current location with dzodofe, only to deliver this order.</span></label>
+                <label class="consent"><input type="checkbox" id="locConsent"><span>I agree to share my current location with dzodofe, and with a free map lookup service to find my area, only to deliver this order.</span></label>
                 <button type="button" class="btn ghost locbtn" id="locBtn" disabled><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3" fill="currentColor"/><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Use my current location</button>
                 <p class="locok" id="locOk" hidden><span id="locText"></span> <a id="locMap" href="#" target="_blank" rel="noopener">View on map</a> · <button type="button" id="locClear">Remove</button></p>
                 <p class="err" id="locErr" hidden></p>
               </div>
+
+              <p class="note" id="areaHint" hidden style="margin:0"></p>
+
+              <label class="f">Area<select id="area"><option value="">Choose your area</option></select></label>
+
+              <p class="note" style="margin:0">Area not listed? Call (+233) 593 764 210 and we’ll see what we can do.</p>
+
               <label class="f">House or street address<input type="text" id="address" autocomplete="street-address" maxlength="200"></label>
-              <label class="f">Directions or GhanaPost GPS <em>(optional)</em><input type="text" id="directions" maxlength="200" placeholder="e.g. GA-123-4567, or a nearby landmark"></label>
+
+              <details class="more"><summary>+ Add directions or GhanaPost GPS (optional)</summary>
+              <label class="f">Directions or GhanaPost GPS<input type="text" id="directions" maxlength="200" placeholder="e.g. GA-123-4567, or a nearby landmark"></label>
+              </details>
             </div>
             <p class="note" id="riderNote" hidden style="margin:0">We’ll WhatsApp you the pickup point and the time your food will be ready, so you can send your rider.</p>
             <label class="f">Allergies or notes <em>(optional)</em><textarea id="notes" maxlength="1000" placeholder="Tell us about any allergies, or anything we should know."></textarea></label>
@@ -1057,7 +1068,27 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     $('locMap').href = 'https://www.google.com/maps?q=' + PIN.lat + ',' + PIN.lng;
     $('locOk').hidden = false; $('locErr').hidden = true;
   }
-  function clearPin(){ PIN = null; PLACE = ''; $('locOk').hidden = true; $('locErr').hidden = true; $('locConsent').checked = false; $('locBtn').disabled = true; var pa = $('placeSlot').firstChild; if (pa && 'value' in pa) try { pa.value = ''; } catch(e){} }
+  function suggestArea(lat, lng){
+    var hint = $('areaHint');
+    if (!ZONES.length || $('area').value) return;
+    hint.textContent = 'Finding your area…'; hint.hidden = false;
+    var ctl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = setTimeout(function(){ if (ctl) ctl.abort(); }, 7000);
+    function miss(){ clearTimeout(timer); hint.textContent = 'We couldn’t tell your area. Please choose it below.'; hint.hidden = false; }
+    fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&addressdetails=1&accept-language=en&lat=' + lat + '&lon=' + lng, ctl ? { signal: ctl.signal } : {})
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        clearTimeout(timer);
+        var a = (j && j.address) || {}, hay = [];
+        ['suburb','neighbourhood','quarter','city_district','village','town','hamlet','locality','residential'].forEach(function(k){ if (a[k]) hay.push(String(a[k]).trim().toLowerCase()); });
+        var z = ZONES.filter(function(x){ return hay.indexOf(String(x.area).trim().toLowerCase()) !== -1; })[0];
+        if (!z || $('area').value) return miss();
+        $('area').value = z.area; $('area').dispatchEvent(new Event('change'));
+        hint.textContent = 'We picked ' + z.area + ' from your location. Please check it’s right.'; hint.hidden = false;
+      })
+      .catch(miss);
+  }
+  function clearPin(){ $('areaHint').hidden = true; PIN = null; PLACE = ''; $('locOk').hidden = true; $('locErr').hidden = true; $('locConsent').checked = false; $('locBtn').disabled = true; var pa = $('placeSlot').firstChild; if (pa && 'value' in pa) try { pa.value = ''; } catch(e){} }
   $('locClear').addEventListener('click', clearPin);
   $('locConsent').addEventListener('change', function(){ $('locBtn').disabled = !this.checked; });
   $('locBtn').addEventListener('click', function(){
@@ -1069,6 +1100,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
       b.disabled = false; b.lastChild.textContent = t0;
       PLACE = PLACE || 'Current location';
       setPin(pos.coords.latitude, pos.coords.longitude, 'Your current location is added');
+      suggestArea(pos.coords.latitude, pos.coords.longitude);
     }, function(err){
       b.disabled = false; b.lastChild.textContent = t0;
       e.textContent = err && err.code === 1 ? 'Location permission was turned off. You can allow it in your browser settings, or just type your address.' : 'We couldn’t get your location. Please type your address instead.';
