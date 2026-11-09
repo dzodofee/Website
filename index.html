@@ -482,7 +482,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
           <ul class="lines" id="lines"></ul>
           <div class="sum" id="sum" hidden>
             <div><span>Food</span><span id="foodTotal">GH₵0</span></div>
-            <div class="muted"><span>Delivery</span><span id="feeLine">Share your location</span></div>
+            <div class="muted"><span>Delivery</span><span id="feeLine">Choose your area</span></div>
             <p class="note" id="bigNote" hidden style="margin:0">Orders of 4 or more plates add GH₵50 to delivery, because we deliver them by car.</p>
             <div class="muted" id="procRow" hidden><span>Payment fee (Paystack)</span><span id="procLine">GH₵0</span></div>
             <div class="grand"><span>Total</span><span id="grandTotal">GH₵0</span></div>
@@ -513,29 +513,37 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
           </div>
           <div class="fields">
             <div class="fields" id="addrFields" style="margin-top:0">
-              <div class="loc" id="locBox">
-                <p class="loch">Share your location <em>(needed for your delivery fee)</em></p>
-                <div id="placeWrap" hidden><div id="placeSlot"></div></div>
-                <label class="consent"><input type="checkbox" id="locConsent"><span>I agree to share my current location with dzodofe, and with a free map lookup service to find my area, only to deliver this order.</span></label>
-                <button type="button" class="btn ghost locbtn" id="locBtn" disabled><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3" fill="currentColor"/><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Use my current location</button>
-                <p class="locok" id="locOk" hidden><span id="locText"></span> <a id="locMap" href="#" target="_blank" rel="noopener">View on map</a> · <button type="button" id="locClear">Remove</button></p>
-                <p class="err" id="locErr" hidden></p>
-              </div>
+
+              <label class="f">Your delivery address <em>(house, street and area, or a landmark)</em><input type="text" id="address" autocomplete="street-address" maxlength="200" placeholder="e.g. House 5, Madina, or Ridge Hospital"></label>
+
+              <p class="note" id="addrFound" hidden style="margin:0"></p>
+
 
               <p class="note" id="areaHint" hidden style="margin:0"></p>
+
 
               <div id="areaPick">
               <label class="f">Area<select id="area"><option value="">Choose your area</option></select></label>
               </div>
+
               <p class="areaSum" id="areaSum" hidden><span id="areaSumText"></span> <button type="button" id="areaChange">Change</button></p>
+
 
               <p class="note" style="margin:0">Area not listed? Call (+233) 593 764 210 and we’ll see what we can do.</p>
 
-              <label class="f">Your delivery address <em>(house, street and area, or your GPS address)</em><input type="text" id="address" autocomplete="street-address" maxlength="200" placeholder="e.g. House 5, Madina, or GA-123-4567"></label>
 
               <details class="more"><summary>+ Add directions or GhanaPost GPS (optional)</summary>
               <label class="f">Directions or GhanaPost GPS<input type="text" id="directions" maxlength="200" placeholder="e.g. GA-123-4567, or a nearby landmark"></label>
               </details>
+
+              <div class="loc" id="locBox">
+                <p class="loch">At the delivery spot? <em>(optional: use your current location)</em></p>
+                <div id="placeWrap" hidden><div id="placeSlot"></div></div>
+                <label class="consent"><input type="checkbox" id="locConsent"><span>I agree to share my current location with dzodofe, and with a free map lookup service to find my area and delivery fee, only to deliver this order.</span></label>
+                <button type="button" class="btn ghost locbtn" id="locBtn" disabled><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3" fill="currentColor"/><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Use my current location</button>
+                <p class="locok" id="locOk" hidden><span id="locText"></span> <a id="locMap" href="#" target="_blank" rel="noopener">View on map</a> · <button type="button" id="locClear">Remove</button></p>
+                <p class="err" id="locErr" hidden></p>
+              </div>
             </div>
             <p class="note" id="riderNote" hidden style="margin:0">We’ll WhatsApp you the pickup point and the time your food will be ready, so you can send your rider.</p>
             <label class="f">Allergies or notes <em>(optional)</em><textarea id="notes" maxlength="1000" placeholder="Tell us about any allergies, or anything we should know."></textarea></label>
@@ -838,7 +846,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     $('emptyLine').hidden = ids.length > 0; $('sum').hidden = ids.length === 0;
     var fee = feeNow();
     var net = total + (fee || 0), proc = (!MANUAL && total > 0 && fee != null) ? Math.round((grossUp(net) - net) * 100) / 100 : 0, grand = net + proc;
-    $('feeLine').textContent = $('ful-rider').checked ? 'None (your own rider)' : fee == null ? 'Share your location' : ced(fee);
+    $('feeLine').textContent = $('ful-rider').checked ? 'None (your own rider)' : fee == null ? 'Choose your area' : ced(fee);
     $('bigNote').hidden = $('ful-rider').checked || cartQty() < PRICING.bigQty;
     $('procRow').hidden = !proc; $('procLine').textContent = ced(proc);
     $('foodTotal').textContent = ced(total); $('grandTotal').textContent = ced(grand);
@@ -850,7 +858,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     lastCount = count; syncBar(); renderDish(); showTitleSub();
     $('placeBtn').textContent = count ? 'Place order · ' + ced(grand) : 'Place order';
   }
-  function feeNow(){ if ($('ful-rider').checked) return 0; var f = distFee(); if (f == null) return null; return f + (cartQty() >= PRICING.bigQty ? PRICING.bigExtra : 0); }
+  function feeNow(){
+    if ($('ful-rider').checked) return 0;
+    var extra = cartQty() >= PRICING.bigQty ? PRICING.bigExtra : 0, f = distFee();
+    if (f != null) return f + extra;
+    var a = $('area').value, z = ZONES.filter(function(x){ return x.area === a; })[0];
+    return z ? z.fee + extra : null;
+  }
   function renderZones(){
     var sel = $('area'), keep = sel.value; sel.innerHTML = '<option value="">Choose your area</option>';
     ZONES.forEach(function(z){ var o = document.createElement('option'); o.value = z.area; o.textContent = z.area; if (z.area === keep) o.selected = true; sel.appendChild(o); });
@@ -961,7 +975,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     if (val('phone').replace(/\D/g, '').length < 9) return fail($('err-details'), 'Please enter a phone number we can WhatsApp.', $('phone'));
     if (!MANUAL && !val('email')) return fail($('err-details'), 'Please add your email. Paystack sends your payment receipt there.', $('email'));
     if (val('email') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('email'))) return fail($('err-details'), 'Please check your email address.', $('email'));
-    if (!$('ful-rider').checked && !PIN) return fail($('err-address'), 'Please share your location so we can work out your delivery fee.', $('locBtn'));
     if (!$('ful-rider').checked && (!val('area') || !val('address'))) return fail($('err-address'), !val('area') ? 'Please choose your area.' : 'Please add your house or street address.', !val('area') ? $('area') : $('address'));
     return true;
   }
@@ -982,7 +995,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     var items = Object.keys(cart).map(function(k){ return { id:kItem(k), spice:kSpice(k), qty:cart[k] }; });
     var data = { date: document.querySelector('input[name="date"]:checked').value, name: val('name'), phone: val('phone'), email: val('email'),
       fulfil: $('ful-rider').checked ? 'rider' : 'delivery',
-      area: $('ful-rider').checked ? '' : val('area'), address: $('ful-rider').checked ? '' : val('address'), directions: $('ful-rider').checked ? '' : val('directions'), pin: $('ful-rider').checked ? null : PIN, place: $('ful-rider').checked ? '' : PLACE, notes: val('notes'),
+      area: $('ful-rider').checked ? '' : val('area'), address: $('ful-rider').checked ? '' : val('address'), directions: $('ful-rider').checked ? '' : val('directions'), pin: $('ful-rider').checked ? null : PIN, pinSrc: $('ful-rider').checked ? '' : PIN_SRC, place: $('ful-rider').checked ? '' : PLACE, notes: val('notes'),
       payment: MANUAL ? 'momo' : 'online', items: items, website: $('website').value };
     var btn = $('placeBtn'), label0 = btn.textContent;
     btn.disabled = true; btn.innerHTML = '<span class="spin" aria-hidden="true"></span> Placing your order…';
@@ -1086,7 +1099,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
   }); });
 
   /* ----- location: Google search + current location (with consent) ----- */
-  var GMAPS_KEY = '', PIN = null, PLACE = '';
+  var GMAPS_KEY = '', PIN = null, PLACE = '', PIN_SRC = '';
   function setPin(lat, lng, label){
     PIN = { lat: Math.round(lat * 1e6) / 1e6, lng: Math.round(lng * 1e6) / 1e6 };
     $('locText').textContent = '📍 ' + (label || 'Location added');
@@ -1146,8 +1159,41 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
       })
       .catch(miss);
   }
-  function clearPin(){ $('areaHint').hidden = true; if (AREA_LOCKED) lockArea(false, true); else { $('area').disabled = false; AREA_AUTO = false; syncAreaUI(); } PIN = null; PLACE = ''; $('locOk').hidden = true; $('locErr').hidden = true; $('locConsent').checked = false; $('locBtn').disabled = true; var pa = $('placeSlot').firstChild; if (pa && 'value' in pa) try { pa.value = ''; } catch(e){} renderAll(); }
-  $('locClear').addEventListener('click', clearPin);
+  var GEO_SEQ = 0, geoTimer;
+  function addrMsg(t, mapUrl){
+    var el = $('addrFound'); el.textContent = '';
+    if (!t){ el.hidden = true; return; }
+    el.appendChild(document.createTextNode(t));
+    if (mapUrl){ var a = document.createElement('a'); a.href = mapUrl; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'View on map'; el.appendChild(document.createTextNode(' · ')); el.appendChild(a); }
+    el.hidden = false;
+  }
+  function dropAddrPin(){ if (PIN_SRC === 'address'){ PIN = null; PIN_SRC = ''; PLACE = ''; renderAll(); } }
+  function geocodeAddress(){
+    if (PIN_SRC === 'gps') return;
+    var q = $('address').value.trim();
+    if ($('ful-rider').checked || q.length < 4){ GEO_SEQ++; dropAddrPin(); addrMsg(''); return; }
+    var area = $('area').value, seq = ++GEO_SEQ;
+    addrMsg('Looking up your address…');
+    var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=gh&accept-language=en&viewbox=-0.55,6.05,0.45,5.35&bounded=1&q=' + encodeURIComponent(q + (area ? ', ' + area : '') + ', Accra, Ghana');
+    var ctl = ('AbortController' in window) ? new AbortController() : null, timer = setTimeout(function(){ if (ctl) ctl.abort(); }, 8000);
+    function miss(){ clearTimeout(timer); if (seq !== GEO_SEQ || PIN_SRC === 'gps') return; dropAddrPin(); addrMsg('We couldn’t find that on the map, so we’ll use the price for your area. Please choose your area. We may call to confirm the place.'); }
+    fetch(url, ctl ? { signal: ctl.signal } : {}).then(function(r){ return r.json(); }).then(function(rows){
+      clearTimeout(timer);
+      if (seq !== GEO_SEQ || PIN_SRC === 'gps') return;
+      var r = rows && rows[0], lat = r ? parseFloat(r.lat) : NaN, lng = r ? parseFloat(r.lon) : NaN;
+      if (!r || !isFinite(lat) || !isFinite(lng) || kmBetween(PRICING.kitchen.lat, PRICING.kitchen.lng, lat, lng) > 90) return miss();
+      PIN = { lat: Math.round(lat * 1e6) / 1e6, lng: Math.round(lng * 1e6) / 1e6 }; PIN_SRC = 'address';
+      PLACE = String(r.display_name || '').split(',').slice(0, 3).join(',').trim().slice(0, 150);
+      addrMsg('📍 We found: ' + PLACE + '. If that’s the wrong place, add more detail to your address.', 'https://www.google.com/maps?q=' + PIN.lat + ',' + PIN.lng);
+      renderAll();
+    }).catch(miss);
+  }
+  function scheduleGeo(){ clearTimeout(geoTimer); geoTimer = setTimeout(geocodeAddress, 900); }
+  $('address').addEventListener('input', scheduleGeo);
+  $('address').addEventListener('blur', function(){ clearTimeout(geoTimer); geocodeAddress(); });
+  $('area').addEventListener('change', scheduleGeo);
+  function clearPin(){ $('areaHint').hidden = true; if (AREA_LOCKED) lockArea(false, true); else { $('area').disabled = false; AREA_AUTO = false; syncAreaUI(); } PIN = null; PLACE = ''; PIN_SRC = ''; $('locOk').hidden = true; $('locErr').hidden = true; $('locConsent').checked = false; $('locBtn').disabled = true; var pa = $('placeSlot').firstChild; if (pa && 'value' in pa) try { pa.value = ''; } catch(e){} renderAll(); }
+  $('locClear').addEventListener('click', function(){ clearPin(); scheduleGeo(); });
   $('locConsent').addEventListener('change', function(){ $('locBtn').disabled = !this.checked; });
   $('locBtn').addEventListener('click', function(){
     var b = this, e = $('locErr');
@@ -1156,7 +1202,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);bo
     b.disabled = true; var t0 = b.lastChild.textContent; b.lastChild.textContent = 'Finding you…';
     navigator.geolocation.getCurrentPosition(function(pos){
       b.disabled = false; b.lastChild.textContent = t0;
-      PLACE = PLACE || 'Current location';
+      PLACE = PLACE || 'Current location'; PIN_SRC = 'gps'; $('addrFound').hidden = true;
       setPin(pos.coords.latitude, pos.coords.longitude, 'Your current location is added');
       suggestArea(pos.coords.latitude, pos.coords.longitude);
     }, function(err){
